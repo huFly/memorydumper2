@@ -394,9 +394,17 @@ func dumpAndOpenGraph(dumping ptr: UnsafeRawPointer, knownSize: UInt?, maxDepth:
     }
     line("}")
     
-    let path = "/tmp/\(filename).dot"
+    let path = "./\(filename).dot"
     try! result.write(toFile: path, atomically: false, encoding: .utf8)
-    NSWorkspace.shared.openFile(path, withApplication: "Graphviz")
+    runScript(fileName: filename)
+}
+
+func runScript(fileName: String) {
+    let task = Process()
+    task.launchPath = "/bin/sh";
+    let dotCmd = "/usr/local/bin/dot"
+    task.arguments = ["-c", "\(dotCmd) -Tpng \"\(fileName)\".dot -o \"\(fileName)\".png"]
+    task.launch()
 }
 
 func dumpAndOpenGraph<T>(dumping value: T, maxDepth: Int, filename: String) {
